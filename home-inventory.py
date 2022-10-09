@@ -1,13 +1,15 @@
 # import ui package
+import imp
 from tkinter import *
+
+#import excel package
+from openpyxl import *
 
 # import database package
 import sqlite3
 
-# import re package
-import re
-
-db_name = "database_rev4.db"
+db_name = "./home-inventory/development.db"
+wb_name = "./home-inventory/export.xlsx"
 
 # connect to database with name
 db_con = sqlite3.connect(db_name)
@@ -18,6 +20,10 @@ db_cur = db_con.cursor()
 # create initial response
 db_res = db_cur.execute("SELECT name FROM sqlite_master")
 db_res.fetchone()
+
+# initialize excel sheet
+wb1 = Workbook()
+ws1 = wb1.active
 
 def db_create():
     # execute command
@@ -54,7 +60,7 @@ def db_delete(rowID):
 def generate_id():
     id_array = []
     for db_row in db_cur.execute("SELECT ID FROM Main"):
-        id_array.append(int(re.sub(r'[^\w\s]', '', str(db_row))))
+        id_array.append(int(str(db_row).replace("'","").replace("(","").replace(")","").replace(',',"")))
 
     if(len(id_array) == 0):
         next_id = 100
@@ -116,6 +122,8 @@ def exit_app():
     root.destroy()
     # database close
     db_con.close()
+    # save excel sheet
+    wb1.save(wb_name)
 
 # Put data from data buffer into text boxes
 def insert_data():
@@ -196,6 +204,11 @@ def delete_data():
     # set status
     status.configure(text = 'Data deleted')
 
+def export_data():
+    for db_row in db_cur.execute("SELECT * FROM Main"):
+        parsed = str(db_row).replace("'","").replace("(","").replace(")","").split(',')
+        ws1.append(parsed)
+
 # ID
 lbl1 = Label(root, text = "ID", justify = LEFT)
 lbl1.grid(row = 0, column = 0)
@@ -267,6 +280,10 @@ clear_bttn.grid(column = 0, row = 11)
 # Exit Button
 exit_bttn = Button(root, text = "Exit", fg = "black", bg = "white", width = 10, command = exit_app)
 exit_bttn.grid(column = 0, row = 12)
+
+# Export Button
+exit_bttn = Button(root, text = "Export", fg = "black", bg = "white", width = 10, command = export_data)
+exit_bttn.grid(column = 0, row = 15)
 
 
 # db_create()
