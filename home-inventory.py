@@ -29,8 +29,8 @@ def db_create():
     # execute command
     # create new main table
     db_cur.execute("CREATE TABLE Main(ID, Class, Manufacturer,\
-                                      Model Number, Serial Number,\
-                                      Date Acquired, Description, Status, \
+                                      ModelNumber, SerialNumber,\
+                                      DateAcquired, Description, Status, \
                                       Location, Assembly)")
 
 def db_add_test():
@@ -43,6 +43,23 @@ def db_add_test():
 
 def db_write():
     db_cur.execute("INSERT INTO Main VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", dataBuffer)
+    db_con.commit()
+
+def db_checkout():
+    db_cur.execute("UPDATE Main SET Location = ?, Assembly = ? WHERE ID = ?", [dataBuffer[8], dataBuffer[9], dataBuffer[0]])
+    db_con.commit()
+
+def db_checkin():
+    db_cur.execute("UPDATE Main SET Location = ?, Assembly = ? WHERE ID = ?", ['Storage', 'N/A', dataBuffer[0]])
+    db_con.commit()
+
+def db_modify():
+    db_cur.execute("UPDATE Main SET Class = ?, Manufacturer = ?, 'ModelNumber' = ?, \
+                                    'SerialNumber' = ?, 'DateAcquired' = ?, Description = ?, \
+                                    Status = ?, Location = ?, Assembly = ? WHERE ID = ?", \
+                                    [dataBuffer[1], dataBuffer[2], dataBuffer[3], \
+                                     dataBuffer[4], dataBuffer[5], dataBuffer[6], \
+                                     dataBuffer[7], dataBuffer[8], dataBuffer[9], dataBuffer[0]])
     db_con.commit()
 
 def db_read(rowID):
@@ -71,35 +88,6 @@ def generate_id():
 # ui initalization
 root = Tk()
 root.title('Inventory System')
-
-# adding menu bar in root windows
-menubar = Menu(root)
-root.config(menu = menubar)
-
-# create the file_menu
-file_menu = Menu(menubar, tearoff = 0)
-
-# add menu items to the File menu
-file_menu.add_command(label = 'New')
-file_menu.add_command(label = 'Open...')
-file_menu.add_command(label = 'Close')
-file_menu.add_separator()
-
-# add Exit menu item
-file_menu.add_command(label = 'Exit', command = root.destroy)
-
-menubar.add_cascade(label = "File", menu = file_menu, underline = 0)
-
-# create the Item menu
-item_menu = Menu(menubar, tearoff = 0)
-
-item_menu.add_command(label = 'Add')
-item_menu.add_command(label = 'Remove')
-item_menu.add_command(label = 'Edit')
-item_menu.add_command(label = 'Read')
-
-# add item menu to the menubar
-menubar.add_cascade(label = "Item", menu = item_menu, underline = 0)
 
 # data structures
 input_text = []
@@ -209,6 +197,45 @@ def export_data():
         parsed = str(db_row).replace("'","").replace("(","").replace(")","").split(',')
         ws1.append(parsed)
 
+def check_out():
+    # load buffer
+    get_data()
+
+    # modify database using buffer
+    db_checkout()
+
+    # clear data
+    clear_data()
+
+    # update status
+    status.configure(text = 'Data modified')
+
+def check_in():
+    # load buffer
+    get_data()
+
+    # modify database using buffer
+    db_checkin()
+
+    # clear data
+    clear_data()
+
+    # update status
+    status.configure(text = 'Data modified')
+
+def modify_data():
+    # load buffer
+    get_data()
+
+    # modify database using buffer
+    db_modify()
+
+    # clear data
+    clear_data()
+
+    # update status
+    status.configure(text = 'Data modified')
+
 # ID
 lbl1 = Label(root, text = "ID", justify = LEFT)
 lbl1.grid(row = 0, column = 0)
@@ -259,19 +286,19 @@ enter_bttn.grid(column = 0, row = 10)
 
 # Read Button
 read_bttn = Button(root, text = "Read", fg = "black", bg = "white", width = 10, command = read_data)
-read_bttn.grid(column = 0, row = 13)
+read_bttn.grid(column = 0, row = 12)
 
 # Read text box
 read_txt = Entry(root, width = 50)
-read_txt.grid(column = 1, row = 13)
+read_txt.grid(column = 1, row = 12)
 
 # Delete Button
 delete_bttn = Button(root, text = "Delete", fg = "black", bg = "white", width = 10, command = delete_data)
-delete_bttn.grid(column = 0, row = 14)
+delete_bttn.grid(column = 0, row = 13)
 
 # Delete text box
 delete_txt = Entry(root, width = 50)
-delete_txt.grid(column = 1, row = 14)
+delete_txt.grid(column = 1, row = 13)
 
 # Clear Button
 clear_bttn = Button(root, text = "Clear", fg = "black", bg = "white", width = 10, command = clear_data)
@@ -279,12 +306,31 @@ clear_bttn.grid(column = 0, row = 11)
 
 # Exit Button
 exit_bttn = Button(root, text = "Exit", fg = "black", bg = "white", width = 10, command = exit_app)
-exit_bttn.grid(column = 0, row = 12)
+exit_bttn.grid(column = 0, row = 17)
 
 # Export Button
 exit_bttn = Button(root, text = "Export", fg = "black", bg = "white", width = 10, command = export_data)
-exit_bttn.grid(column = 0, row = 15)
+exit_bttn.grid(column = 0, row = 18)
 
+# Modify Button
+exit_bttn = Button(root, text = "Modify", fg = "black", bg = "white", width = 10, command = modify_data)
+exit_bttn.grid(column = 0, row = 14)
+
+# Check out Button
+checkout_bttn = Button(root, text = "Check out", fg = "black", bg = "white", width = 10, command = check_out)
+checkout_bttn.grid(column = 0, row = 16)
+
+# Check out text box
+checkout_txt = Entry(root, width = 50)
+checkout_txt.grid(column = 1, row = 16)
+
+# Check in Button
+checkout_bttn = Button(root, text = "Check in", fg = "black", bg = "white", width = 10, command = check_in)
+checkout_bttn.grid(column = 0, row = 15)
+
+# Check in text box
+checkin_txt = Entry(root, width = 50)
+checkin_txt.grid(column = 1, row = 15)
 
 # db_create()
 # db_add_test()
