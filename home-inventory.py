@@ -1,5 +1,4 @@
 # import ui package
-import imp
 from tkinter import *
 
 #import excel package
@@ -96,7 +95,7 @@ dataBuffer = []
 # Function to initialize 11 UI text boxes
 def add_text():
     for i in range(10):
-        textbox = Entry(root, width = 50)
+        textbox = Entry(root, width = 30, font=('Arial', 14))
         textbox.grid(row = i, column = 1)
         input_text.append(textbox)
         dataBuffer.append('-1')
@@ -135,6 +134,7 @@ def clear_data():
     for i in range(len(input_text)):
         input_text[i].delete(0,END)
 
+    index_txt.delete(0,END)
     status.configure(text = 'Data Cleared')
 
 def write_data():
@@ -155,7 +155,7 @@ def write_data():
 
 def read_data():
     # check read id
-    read_id = read_txt.get()
+    read_id = index_txt.get()
 
     # query database
     test = db_read(read_id)
@@ -173,7 +173,7 @@ def read_data():
 
 def delete_data():
     # check delete id
-    delete_id = delete_txt.get()
+    delete_id = index_txt.get()
 
     # query database
     test = db_read(delete_id)
@@ -208,7 +208,7 @@ def check_out():
     clear_data()
 
     # update status
-    status.configure(text = 'Data modified')
+    status.configure(text = 'Item checked out')
 
 def check_in():
     # load buffer
@@ -221,7 +221,7 @@ def check_in():
     clear_data()
 
     # update status
-    status.configure(text = 'Data modified')
+    status.configure(text = 'Item checked out')
 
 def modify_data():
     # load buffer
@@ -280,57 +280,49 @@ lbl11.grid(row = 9, column = 0)
 status = Label(root, text = "", justify = LEFT)
 status.grid(row = 10, column = 1)
 
+# index text box
+index_txt = Entry(root, width = 30, font=('Arial', 14))
+index_txt.grid(column = 1, row = 11)
+
+# Index
+status = Label(root, text = "Index", justify = LEFT)
+status.grid(row = 11, column = 0)
+
 # Enter Data Button
 enter_bttn = Button(root, text = "Enter", fg = "black", bg = "white", width = 10, command = write_data)
-enter_bttn.grid(column = 0, row = 10)
-
-# Read Button
-read_bttn = Button(root, text = "Read", fg = "black", bg = "white", width = 10, command = read_data)
-read_bttn.grid(column = 0, row = 12)
-
-# Read text box
-read_txt = Entry(root, width = 50)
-read_txt.grid(column = 1, row = 12)
-
-# Delete Button
-delete_bttn = Button(root, text = "Delete", fg = "black", bg = "white", width = 10, command = delete_data)
-delete_bttn.grid(column = 0, row = 13)
-
-# Delete text box
-delete_txt = Entry(root, width = 50)
-delete_txt.grid(column = 1, row = 13)
+enter_bttn.grid(column = 2, row = 0)
 
 # Clear Button
 clear_bttn = Button(root, text = "Clear", fg = "black", bg = "white", width = 10, command = clear_data)
-clear_bttn.grid(column = 0, row = 11)
+clear_bttn.grid(column = 2, row = 1)
 
-# Exit Button
-exit_bttn = Button(root, text = "Exit", fg = "black", bg = "white", width = 10, command = exit_app)
-exit_bttn.grid(column = 0, row = 17)
+# Read Button
+read_bttn = Button(root, text = "Read", fg = "black", bg = "white", width = 10, command = read_data)
+read_bttn.grid(column = 2, row = 2)
 
-# Export Button
-exit_bttn = Button(root, text = "Export", fg = "black", bg = "white", width = 10, command = export_data)
-exit_bttn.grid(column = 0, row = 18)
+# Delete Button
+delete_bttn = Button(root, text = "Delete", fg = "black", bg = "white", width = 10, command = delete_data)
+delete_bttn.grid(column = 2, row = 3)
 
 # Modify Button
-exit_bttn = Button(root, text = "Modify", fg = "black", bg = "white", width = 10, command = modify_data)
-exit_bttn.grid(column = 0, row = 14)
+modify_bttn = Button(root, text = "Modify", fg = "black", bg = "white", width = 10, command = modify_data)
+modify_bttn.grid(column = 2, row = 4)
+
+#Check in Button
+checkin_bttn = Button(root, text = "Check in", fg = "black", bg = "white", width = 10, command = check_in)
+checkin_bttn.grid(column = 2, row = 7)
 
 # Check out Button
 checkout_bttn = Button(root, text = "Check out", fg = "black", bg = "white", width = 10, command = check_out)
-checkout_bttn.grid(column = 0, row = 16)
+checkout_bttn.grid(column = 2, row = 8)
 
-# Check out text box
-checkout_txt = Entry(root, width = 50)
-checkout_txt.grid(column = 1, row = 16)
+# Export Button
+export_bttn = Button(root, text = "Export", fg = "black", bg = "white", width = 10, command = export_data)
+export_bttn.grid(column = 2, row = 9)
 
-# Check in Button
-checkout_bttn = Button(root, text = "Check in", fg = "black", bg = "white", width = 10, command = check_in)
-checkout_bttn.grid(column = 0, row = 15)
-
-# Check in text box
-checkin_txt = Entry(root, width = 50)
-checkin_txt.grid(column = 1, row = 15)
+# Exit Button
+exit_bttn = Button(root, text = "Exit", fg = "black", bg = "white", width = 10, command = exit_app)
+exit_bttn.grid(column = 2, row = 11)
 
 # db_create()
 # db_add_test()
