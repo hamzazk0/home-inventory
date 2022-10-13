@@ -285,8 +285,8 @@ index_txt = Entry(root, width = 30, font=('Arial', 14))
 index_txt.grid(column = 1, row = 11)
 
 # Index
-status = Label(root, text = "Index", justify = LEFT)
-status.grid(row = 11, column = 0)
+index_lbl = Label(root, text = "Index", justify = LEFT)
+index_lbl.grid(row = 11, column = 0)
 
 # Enter Data Button
 enter_bttn = Button(root, text = "Enter", fg = "black", bg = "white", width = 10, command = write_data)
