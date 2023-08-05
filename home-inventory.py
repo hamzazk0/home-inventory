@@ -8,7 +8,8 @@ from openpyxl import *
 import sqlite3
 
 db_name = "./home-inventory/development.db"
-wb_name = "./home-inventory/export.xlsx"
+wb1_name = "./home-inventory/export.xlsx"
+wb2_name = "./home-inventory/query.xlsx"
 
 # connect to database with name
 db_con = sqlite3.connect(db_name)
@@ -22,7 +23,11 @@ db_res.fetchone()
 
 # initialize excel sheet
 wb1 = Workbook()
-ws1 = wb1.active
+wb1s1 = wb1.active
+
+wb2 = Workbook()
+wb2s1 = wb2.active
+
 
 def db_create():
     # execute command
@@ -84,6 +89,20 @@ def generate_id():
         next_id = max(id_array) + 1
     return(str(next_id))
 
+def db_query():
+    wb2s1.delete_rows(1, wb2s1.max_row)
+    
+    query = query_txt.get()
+    query_txt.delete(0,END)
+
+    # print(query)
+    for db_row in db_cur.execute(query):
+        parsed = str(db_row).replace("'","").replace("(","").replace(")","").split(',')
+        wb2s1.append(parsed)
+        print(db_row)
+
+    wb2.save(wb2_name)
+
 # ui initalization
 root = Tk()
 root.title('Inventory System')
@@ -109,8 +128,6 @@ def exit_app():
     root.destroy()
     # database close
     db_con.close()
-    # save excel sheet
-    wb1.save(wb_name)
 
 # Put data from data buffer into text boxes
 def insert_data():
@@ -193,9 +210,13 @@ def delete_data():
     status.configure(text = 'Data deleted')
 
 def export_data():
+    wb1s1.delete_rows(1, wb1s1.max_row)
+    
     for db_row in db_cur.execute("SELECT * FROM Main"):
         parsed = str(db_row).replace("'","").replace("(","").replace(")","").split(',')
-        ws1.append(parsed)
+        wb1s1.append(parsed)
+
+    wb1.save(wb1_name)
 
 def check_out():
     # load buffer
@@ -221,7 +242,7 @@ def check_in():
     clear_data()
 
     # update status
-    status.configure(text = 'Item checked out')
+    status.configure(text = 'Item checked in')
 
 def modify_data():
     # load buffer
@@ -324,8 +345,22 @@ export_bttn.grid(column = 2, row = 9)
 exit_bttn = Button(root, text = "Exit", fg = "black", bg = "white", width = 10, command = exit_app)
 exit_bttn.grid(column = 2, row = 11)
 
+
+# Query Label
+query_lbl = Label(root, text = "SQL", justify = LEFT)
+query_lbl.grid(row = 13, column = 0)
+
+# Query Text Box
+query_txt = Entry(root, width = 30, font=('Arial', 14))
+query_txt.grid(row = 13, column = 1)
+
+# Query Button
+query_bttn = Button(root, text = "Query", fg = "black", bg = "white", width = 10, command = db_query)
+query_bttn.grid(row = 13, column = 2)
+
+
 # db_create()
 # db_add_test()
-db_read_table()
+# db_read_table()
 
 root.mainloop()
